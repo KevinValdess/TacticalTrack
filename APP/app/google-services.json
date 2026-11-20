@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "641456249761",
+    "project_id": "tacticaltrack-3cfa7",
+    "storage_bucket": "tacticaltrack-3cfa7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:641456249761:android:1d306ac214ee0aa45cc9e0",
+        "android_client_info": {
+          "package_name": "cl.duoc.tacticaltrack"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBoLsinmX-xlmwzwcXE78TOYPlIipnnVw8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
