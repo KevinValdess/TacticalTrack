@@ -1,0 +1,150 @@
+{
+  "info": {
+    "name": "TacticalTrack API propia y push",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "visitId",
+      "value": ""
+    },
+    {
+      "key": "fcmToken",
+      "value": "COMPLETAR_TOKEN_REAL"
+    }
+  ],
+  "item": [
+    {
+      "name": "Consultar puntos",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/points"
+      }
+    },
+    {
+      "name": "Consultar equipos",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/assets?pointId=PV-001"
+      }
+    },
+    {
+      "name": "Crear visita y aviso",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/visits",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"operatorName\": \"Kevin\",\n  \"operatorRole\": \"Operario\",\n  \"pointId\": \"PV-001\",\n  \"pointName\": \"Demo\",\n  \"assetId\": \"ACT-001\",\n  \"assetCode\": \"FRZ-001\",\n  \"assetType\": \"Vitrina freezer\",\n  \"visitType\": \"Mantenimiento\",\n  \"equipmentStatus\": \"Operativo\",\n  \"observations\": \"\",\n  \"latitude\": -33.5186,\n  \"longitude\": -70.7159,\n  \"locationAccuracyMeters\": 5,\n  \"distanceToPointMeters\": 10,\n  \"presenceVerified\": true,\n  \"timestamp\": 1794672000000,\n  \"clientRequestId\": \"{{$guid}}\",\n  \"evidenceBase64\": \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a6m0AAAAASUVORK5CYII=\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Visita creada\", function () { pm.response.to.have.status(201); });",
+              "if (pm.response.code===201) pm.collectionVariables.set(\"visitId\", pm.response.json().id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Consultar visita",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/visits/{{visitId}}"
+      }
+    },
+    {
+      "name": "Consultar aviso",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/notifications/{{visitId}}"
+      }
+    },
+    {
+      "name": "Editar visita",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/visits/{{visitId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"equipmentStatus\": \"Con falla\",\n  \"observations\": \"Motor detenido\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Aprobar visita",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/visits/{{visitId}}/status",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"Aprobada\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Registrar dispositivo real (completar token)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/devices/installation-postman",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"supervisorId\": \"SUP-001\",\n  \"fcmToken\": \"{{fcmToken}}\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Desactivar dispositivo de prueba",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/api/devices/installation-postman"
+      }
+    },
+    {
+      "name": "Eliminar visita de prueba",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/api/visits/{{visitId}}"
+      }
+    }
+  ]
+}
