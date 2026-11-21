@@ -5,9 +5,8 @@ import cl.duoc.tacticaltrack.model.DemoAccount
 /** Validación local de prueba; no establece una sesión en el servidor. */
 class DemoAccountsRepository {
     private val accounts = listOf(
-        DemoAccount("kevin@tacticaltrack.example", "Tactical123", "Kevin", "Supervisor"),
-        DemoAccount("jona@tacticaltrack.example", "Tactical123", "Jona", "Operario"),
-        DemoAccount("victor@tacticaltrack.example", "Tactical123", "Víctor", "Operario")
+        DemoAccount("op@duoc.cl", "Prueba", "Operario", "Operario"),
+        DemoAccount("ad@duoc.cl", "Prueba", "Supervisor", "Supervisor")
     )
 
     fun authenticate(email: String, password: String): DemoAccount? =

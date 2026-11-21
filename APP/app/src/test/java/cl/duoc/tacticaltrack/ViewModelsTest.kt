@@ -119,25 +119,25 @@ class ViewModelsTest {
 
     @Test fun loginAssignsSupervisorFromAccountAndRemembersEmail() = runTest(dispatcher) {
         val prefs = mockk<UserPreferencesRepository>(relaxed = true)
-        every { prefs.lastUsername } returns flowOf("jona@tacticaltrack.example")
+        every { prefs.lastUsername } returns flowOf("op@duoc.cl")
         val login = LoginViewModel(prefs); advanceUntilIdle()
-        assertEquals("jona@tacticaltrack.example", login.uiState.value.username)
-        login.onUsernameChange(" KEVIN@TACTICALTRACK.EXAMPLE ")
-        login.onPasswordChange("Tactical123")
+        assertEquals("op@duoc.cl", login.uiState.value.username)
+        login.onUsernameChange(" AD@DUOC.CL ")
+        login.onPasswordChange("Prueba")
         assertTrue(login.validateAndRemember()); advanceUntilIdle()
         assertEquals("Supervisor", login.uiState.value.role)
-        assertEquals("Kevin", login.uiState.value.displayName)
+        assertEquals("Supervisor", login.uiState.value.displayName)
         assertEquals("", login.uiState.value.password)
-        coVerify(exactly = 1) { prefs.saveLastUsername("kevin@tacticaltrack.example") }
+        coVerify(exactly = 1) { prefs.saveLastUsername("ad@duoc.cl") }
     }
 
     @Test fun loginRejectsUnknownAccountAndWrongPassword() = runTest(dispatcher) {
         val prefs = mockk<UserPreferencesRepository>(relaxed = true)
         every { prefs.lastUsername } returns flowOf("")
         val login = LoginViewModel(prefs); advanceUntilIdle()
-        login.onUsernameChange("otro@tacticaltrack.example"); login.onPasswordChange("Tactical123")
+        login.onUsernameChange("otro@tacticaltrack.example"); login.onPasswordChange("Prueba")
         assertFalse(login.validateAndRemember())
-        login.onUsernameChange("kevin@tacticaltrack.example"); login.onPasswordChange("tactical123")
+        login.onUsernameChange("ad@duoc.cl"); login.onPasswordChange("prueba")
         assertFalse(login.validateAndRemember())
         assertEquals("", login.uiState.value.role)
         assertNotNull(login.uiState.value.passwordError)
@@ -148,12 +148,10 @@ class ViewModelsTest {
         val prefs = mockk<UserPreferencesRepository>(relaxed = true)
         every { prefs.lastUsername } returns flowOf("")
         val login = LoginViewModel(prefs); advanceUntilIdle()
-        for ((email, name) in listOf("jona" to "Jona", "victor" to "Víctor")) {
-            login.onUsernameChange("$email@tacticaltrack.example"); login.onPasswordChange("Tactical123")
-            assertTrue(login.validateAndRemember())
-            assertEquals("Operario", login.uiState.value.role)
-            assertEquals(name, login.uiState.value.displayName)
-        }
+        login.onUsernameChange("op@duoc.cl"); login.onPasswordChange("Prueba")
+        assertTrue(login.validateAndRemember())
+        assertEquals("Operario", login.uiState.value.role)
+        assertEquals("Operario", login.uiState.value.displayName)
         login.onPasswordChange("incorrecta")
         assertEquals("", login.uiState.value.role)
         assertFalse(login.validateAndRemember())

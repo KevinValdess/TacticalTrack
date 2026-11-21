@@ -34,9 +34,8 @@ El acceso usa cuentas ficticias con rol fijo:
 
 | Correo | Contraseña de prueba | Nombre | Rol |
 |---|---|---|---|
-| `kevin@tacticaltrack.example` | `Tactical123` | Kevin | Supervisor |
-| `jona@tacticaltrack.example` | `Tactical123` | Jona | Operario |
-| `victor@tacticaltrack.example` | `Tactical123` | Víctor | Operario |
+| `op@duoc.cl` | `Prueba` | Operario | Operario |
+| `ad@duoc.cl` | `Prueba` | Supervisor | Supervisor |
 
 No se envían correos ni se requiere crear estas cuentas en Firebase. La validación es local para la presentación; no hay autenticación ni autorización de usuarios en el servidor. Mantener la API en la red privada de Tailscale para esta prueba. Estas contraseñas son públicas y no deben reutilizarse en cuentas reales.
 
