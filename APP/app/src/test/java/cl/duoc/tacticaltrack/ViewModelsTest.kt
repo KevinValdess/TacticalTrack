@@ -126,7 +126,7 @@ class ViewModelsTest {
         login.onPasswordChange("Prueba")
         assertTrue(login.validateAndRemember()); advanceUntilIdle()
         assertEquals("Supervisor", login.uiState.value.role)
-        assertEquals("Supervisor", login.uiState.value.displayName)
+        assertEquals("Kevin", login.uiState.value.displayName)
         assertEquals("", login.uiState.value.password)
         coVerify(exactly = 1) { prefs.saveLastUsername("ad@duoc.cl") }
     }
@@ -151,7 +151,7 @@ class ViewModelsTest {
         login.onUsernameChange("op@duoc.cl"); login.onPasswordChange("Prueba")
         assertTrue(login.validateAndRemember())
         assertEquals("Operario", login.uiState.value.role)
-        assertEquals("Operario", login.uiState.value.displayName)
+        assertEquals("Victor", login.uiState.value.displayName)
         login.onPasswordChange("incorrecta")
         assertEquals("", login.uiState.value.role)
         assertFalse(login.validateAndRemember())
