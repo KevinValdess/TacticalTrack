@@ -9,9 +9,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Button
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -53,12 +52,14 @@ fun LoginScreen(
             OutlinedTextField(
                 value = state.username,
                 onValueChange = viewModel::onUsernameChange,
-                label = { Text("Usuario") },
-                leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                label = { Text("Correo electrónico") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                singleLine = true,
+                leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
                 isError = state.usernameError != null,
                 trailingIcon = {
                     if (state.usernameError != null) {
-                        Icon(Icons.Default.ErrorOutline, contentDescription = "Error de usuario")
+                        Icon(Icons.Default.ErrorOutline, contentDescription = "Error de correo")
                     }
                 },
                 supportingText = {
@@ -88,34 +89,11 @@ fun LoginScreen(
                     .padding(top = 8.dp)
             )
 
-            Text(
-                "Rol",
-                style = MaterialTheme.typography.labelLarge,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp, bottom = 8.dp)
-            )
-
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                FilterChip(
-                    selected = state.role == "Operario",
-                    onClick = { viewModel.onRoleChange("Operario") },
-                    label = { Text("Operario") }
-                )
-                FilterChip(
-                    selected = state.role == "Supervisor",
-                    onClick = { viewModel.onRoleChange("Supervisor") },
-                    label = { Text("Supervisor") }
-                )
-            }
-
             Button(
                 onClick = {
                     if (viewModel.validateAndRemember()) {
-                        onLoginSuccess(state.username.trim(), state.role)
+                        val account = viewModel.uiState.value
+                        onLoginSuccess(account.displayName, account.role)
                     }
                 },
                 modifier = Modifier
@@ -126,7 +104,7 @@ fun LoginScreen(
             }
 
             Text(
-                "Acceso de prueba: ingresa tu nombre y elige el rol con el que vas a trabajar.",
+                "Ingresa con la cuenta de prueba asignada a tu equipo.",
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(top = 12.dp)
             )

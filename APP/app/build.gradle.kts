@@ -133,7 +133,7 @@ dependencies {
 jacoco { toolVersion = "0.8.12" }
 val logicClasses = fileTree(layout.buildDirectory.dir("tmp/kotlin-classes/debug")) {
     include("**/viewmodel/VisitViewModel*.class", "**/viewmodel/LoginViewModel*.class", "**/viewmodel/WeatherViewModel*.class")
-    include("**/data/repository/VisitRepository*.class", "**/data/repository/WeatherRepository*.class", "**/data/repository/CatalogRepository*.class", "**/data/repository/DeviceRegistrationRepository*.class", "**/domain/*.class")
+    include("**/data/repository/DemoAccountsRepository*.class", "**/data/repository/VisitRepository*.class", "**/data/repository/WeatherRepository*.class", "**/data/repository/CatalogRepository*.class", "**/data/repository/DeviceRegistrationRepository*.class", "**/domain/*.class")
     exclude("**/*Factory*.class")
 }
 val logicSources = files("src/main/java")

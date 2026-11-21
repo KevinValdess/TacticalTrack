@@ -30,7 +30,15 @@ El APK queda en `app/build/outputs/apk/debug/app-debug.apk`. En Windows usar `gr
 
 ## Acceso y visitas
 
-El acceso de prueba pide un nombre de al menos tres caracteres y una contraseña de cuatro o más. Se puede elegir Operario o Supervisor; no es una sesión autenticada en el backend.
+El acceso usa cuentas ficticias con rol fijo:
+
+| Correo | Contraseña de prueba | Nombre | Rol |
+|---|---|---|---|
+| `kevin@tacticaltrack.example` | `Tactical123` | Kevin | Supervisor |
+| `jona@tacticaltrack.example` | `Tactical123` | Jona | Operario |
+| `victor@tacticaltrack.example` | `Tactical123` | Víctor | Operario |
+
+No se envían correos ni se requiere crear estas cuentas en Firebase. La validación es local para la presentación; no hay autenticación ni autorización de usuarios en el servidor. Mantener la API en la red privada de Tailscale para esta prueba. Estas contraseñas son públicas y no deben reutilizarse en cuentas reales.
 
 El operario registra el punto de venta, el equipo, el estado, las observaciones, la foto y la ubicación. El supervisor revisa las visitas y puede aprobarlas o rechazarlas.
 
