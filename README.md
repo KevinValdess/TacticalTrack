@@ -84,7 +84,7 @@ También se puede importar la [colección Postman](PRUEBAS/TacticalTrack.postman
 
 ## Datos de prueba y alcance
 
-El catálogo inicial contiene tres puntos de venta y cinco equipos. El supervisor `SUP-001` está asignado a esos puntos. El rol se asigna al iniciar sesión con una de las [cuentas de prueba](APP/README.md#acceso-y-visitas). La validación es local; todavía no hay autenticación ni autorización de usuarios en el servidor. Para la presentación, mantener la API dentro de la red privada de Tailscale.
+El catálogo inicial contiene tres puntos de venta y cinco equipos. El supervisor `SUP-001` está asignado a esos puntos. La app obtiene el nombre y el rol mediante el login de la API. Ver [acceso y requisitos del backend](APP/README.md#acceso-y-visitas): la ampliación de usuarios instalada en el servidor todavía debe sincronizarse a `API/`. Mantener la API dentro de la red privada de Tailscale.
 
 La verificación GPS usa un radio de 150 metros y la distancia informada por el dispositivo. El clima mostrado corresponde al momento de la consulta, no a la fecha histórica de la visita.
 

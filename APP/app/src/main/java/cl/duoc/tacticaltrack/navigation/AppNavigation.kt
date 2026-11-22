@@ -10,6 +10,14 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import cl.duoc.tacticaltrack.viewmodel.SessionViewModelStore
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import cl.duoc.tacticaltrack.model.AuthUser
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -45,12 +53,52 @@ fun TacticalTrackApp(
     val context = LocalContext.current
     val app = context.applicationContext as TacticalTrackApplication
 
-    val visitViewModel: VisitViewModel = viewModel(
-        factory = VisitViewModel.Factory(app.visitRepository,app.catalogRepository)
-    )
     val loginViewModel: LoginViewModel = viewModel(
-        factory = LoginViewModel.Factory(app.preferencesRepository)
+        factory = LoginViewModel.Factory(app.preferencesRepository, app.authRepository)
     )
+    val sessionScope: SessionViewModelStore = viewModel()
+    val session by loginViewModel.uiState.collectAsStateWithLifecycle()
+    val user = session.user
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner, loginViewModel) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) loginViewModel.restoreSession()
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+    LaunchedEffect(user?.id, user?.role, user?.supervisorId) {
+        if (user == null) sessionScope.clearSession()
+        cl.duoc.tacticaltrack.push.PushRegistration.setRole(context, user?.displayRole.orEmpty(), user?.supervisorId)
+    }
+    if (user == null) {
+        LoginScreen(viewModel = loginViewModel)
+        return
+    }
+    // El almacén conserva los formularios al rotar y se limpia al cerrar sesión.
+    CompositionLocalProvider(LocalViewModelStoreOwner provides sessionScope) {
+        SignedInApp(isExpanded, pendingVisitId, onPushConsumed, user) {
+            loginViewModel.logout {
+                cl.duoc.tacticaltrack.push.PushRegistration.endSession(context)
+            }
+        }
+    }
+}
+
+@Composable
+private fun SignedInApp(
+    isExpanded: Boolean,
+    pendingVisitId: Long?,
+    onPushConsumed: () -> Unit,
+    user: AuthUser,
+    onLogout: () -> Unit
+) {
+    val context = LocalContext.current
+    val app = context.applicationContext as TacticalTrackApplication
+    val visitViewModel: VisitViewModel = viewModel(
+        factory = VisitViewModel.Factory(app.visitRepository, app.catalogRepository)
+    )
+    LaunchedEffect(user) { visitViewModel.setOperator(user.name, user.displayRole) }
 
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -112,26 +160,14 @@ fun TacticalTrackApp(
     ) { scaffoldPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Login.route,
+            startDestination = Screen.Home.route,
             modifier = Modifier.padding(scaffoldPadding)
         ) {
-            composable(Screen.Login.route) {
-                LoginScreen(
-                    viewModel = loginViewModel,
-                    onLoginSuccess = { username, selectedRole ->
-                        visitViewModel.setOperator(username, selectedRole)
-                        cl.duoc.tacticaltrack.push.PushRegistration.setRole(context,selectedRole)
-                        navController.navigate(Screen.Home.route) {
-                            popUpTo(Screen.Login.route) { inclusive = true }
-                        }
-                    }
-                )
-            }
-
             composable(Screen.Home.route) {
                 HomeScreen(
                     viewModel = visitViewModel,
                     isExpanded = isExpanded,
+                    onLogout = onLogout,
                     onNewVisit = {
                         visitViewModel.clearForm()
                         navController.navigate(Screen.NewVisit.route)

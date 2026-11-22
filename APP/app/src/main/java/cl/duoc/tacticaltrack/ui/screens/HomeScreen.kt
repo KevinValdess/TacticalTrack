@@ -38,7 +38,8 @@ import cl.duoc.tacticaltrack.viewmodel.VisitViewModel
 fun HomeScreen(
     viewModel: VisitViewModel,
     isExpanded: Boolean,
-    onNewVisit: () -> Unit
+    onNewVisit: () -> Unit,
+    onLogout: () -> Unit
 ) {
     val visits by viewModel.visits.collectAsStateWithLifecycle()
     val operator by viewModel.operatorName.collectAsStateWithLifecycle()
@@ -50,7 +51,10 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("TacticalTrack") })
+            TopAppBar(
+                title = { Text("TacticalTrack") },
+                actions = { androidx.compose.material3.TextButton(onClick = onLogout) { Text("Cerrar sesión") } }
+            )
         }
     ) { innerPadding ->
         Column(

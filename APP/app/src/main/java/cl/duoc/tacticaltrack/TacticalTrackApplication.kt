@@ -8,7 +8,16 @@ import cl.duoc.tacticaltrack.data.repository.VisitRepository
 class TacticalTrackApplication : Application() {
     override fun onCreate() {
         super.onCreate()
+        val auth = authRepository
+        cl.duoc.tacticaltrack.data.remote.ApiFactory.sessionToken = auth::token
+        cl.duoc.tacticaltrack.data.remote.ApiFactory.onUnauthorized = auth::invalidate
         cl.duoc.tacticaltrack.push.PushRegistration.initialize(this)
+    }
+    val authRepository by lazy {
+        cl.duoc.tacticaltrack.data.repository.AuthRepository(
+            cl.duoc.tacticaltrack.data.remote.ApiFactory.auth,
+            cl.duoc.tacticaltrack.data.local.EncryptedSessionTokenStore(this)
+        )
     }
     val catalogRepository by lazy { cl.duoc.tacticaltrack.data.repository.CatalogRepository(cl.duoc.tacticaltrack.data.remote.ApiFactory.catalog) }
     val database by lazy { AppDatabase.getInstance(this) }

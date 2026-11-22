@@ -30,14 +30,23 @@ El APK queda en `app/build/outputs/apk/debug/app-debug.apk`. En Windows usar `gr
 
 ## Acceso y visitas
 
-El acceso usa cuentas ficticias con rol fijo:
+El acceso se valida en la API mediante `POST /api/auth/login`. Los nombres y roles provienen de `APP_USERS`; la app no contiene una lista de cuentas ni contraseñas. Los usuarios de evaluación ya creados en el servidor son Kevin (`ad@duoc.cl`), Victor (`op@duoc.cl`) y Jonathan (`nuevo@duoc.cl`).
 
-| Correo | Contraseña de prueba | Nombre | Rol |
-|---|---|---|---|
-| `op@duoc.cl` | `Prueba` | Victor | Operario |
-| `ad@duoc.cl` | `Prueba` | Kevin | Supervisor |
+La sesión se guarda cifrada con una clave de Android Keystore. Al abrir la app se comprueba mediante `GET /api/auth/me`, y se vuelve a consultar al regresar a primer plano. Los cambios de nombre se reflejan desde la API. Un HTTP 401 elimina la sesión local y vuelve al acceso. Con un fallo de conexión al iniciar, se puede reintentar la validación sin borrar el token.
 
-No se envían correos ni se requiere crear estas cuentas en Firebase. La validación es local para la presentación; no hay autenticación ni autorización de usuarios en el servidor. Mantener la API en la red privada de Tailscale para esta prueba. Estas contraseñas son públicas y no deben reutilizarse en cuentas reales.
+El botón **Cerrar sesión** desregistra los avisos del dispositivo e intenta revocar el token mediante `POST /api/auth/logout`; la sesión local se elimina incluso sin conexión. Las solicitudes al backend incluyen el token Bearer. Las consultas a Open-Meteo usan un cliente independiente, sin ese token.
+
+Esta versión requiere los endpoints de usuarios y autenticación que se instalaron en el servidor. **El código de esa ampliación del backend todavía debe sincronizarse desde el servidor al repositorio**: la carpeta `API/` de este commit conserva la versión anterior. No reemplazar el JAR desplegado por una compilación de esa carpeta hasta completar dicha sincronización. La protección de visitas y dispositivos sigue pendiente en el servidor; los permisos de usuarios no implican que todos los endpoints estén protegidos.
+
+Para actualizar y compilar desde PowerShell, en la raíz del repositorio:
+
+```powershell
+git pull --ff-only origin main
+cd APP
+.\gradlew.bat assembleRelease "-PbackendUrl=https://server.tailc8b8f3.ts.net:8443/"
+```
+
+Conservar `keystore.properties` y el archivo de firma originales. Instalar `app/build/outputs/apk/release/app-release.apk` como actualización de la app existente.
 
 El operario registra el punto de venta, el equipo, el estado, las observaciones, la foto y la ubicación. El supervisor revisa las visitas y puede aprobarlas o rechazarlas.
 

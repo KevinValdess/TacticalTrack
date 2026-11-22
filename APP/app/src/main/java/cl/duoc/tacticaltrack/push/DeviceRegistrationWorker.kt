@@ -15,7 +15,9 @@ class DeviceRegistrationWorker(context:Context,parameters:WorkerParameters):Coro
   val token=prefs.getString("token",null)
   if(enabled&&token.isNullOrBlank())return Result.retry()
   return try {
-   DeviceRegistrationRepository(ApiFactory.devices).sync(id,PushRegistration.SUPERVISOR_ID,token,enabled)
+   val supervisorId=prefs.getString("supervisorId",null).orEmpty()
+   if(enabled&&supervisorId.isBlank())return Result.failure()
+   DeviceRegistrationRepository(ApiFactory.devices).sync(id,supervisorId,token,enabled)
    prefs.edit().putString("status",if(enabled)"Dispositivo registrado en la API." else "Dispositivo desactivado en la API.").apply()
    Result.success()
   }catch(e:CancellationException){throw e}

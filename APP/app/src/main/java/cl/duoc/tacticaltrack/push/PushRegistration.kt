@@ -13,8 +13,6 @@ import java.util.concurrent.TimeUnit
 
 object PushRegistration {
  const val CHANNEL="visits_supervisor"
- // Supervisor asignado a los puntos de prueba.
- const val SUPERVISOR_ID="SUP-001"
  private val _session=MutableStateFlow(false)
  val supervisorSession=_session.asStateFlow()
  fun preferences(context:Context)=context.getSharedPreferences("push_registration",Context.MODE_PRIVATE)
@@ -26,15 +24,36 @@ object PushRegistration {
   if(!prefs.contains("installationId"))prefs.edit().putString("installationId",UUID.randomUUID().toString()).apply()
   if(prefs.getBoolean("enabled",false)&&prefs.getBoolean("supervisor",false)&&configured(context)) refreshToken(context)
  }
- fun setRole(context:Context,role:String){
-  val supervisor=role=="Supervisor"
+ fun setRole(context:Context,role:String,supervisorId:String?=null){
+  val supervisor=role=="Supervisor"&&!supervisorId.isNullOrBlank()
   _session.value=supervisor
   val prefs=preferences(context)
-  prefs.edit().putBoolean("supervisor",supervisor).apply()
+  val previousSupervisor=prefs.getString("supervisorId",null)
+  prefs.edit().putBoolean("supervisor",supervisor).putString("supervisorId",if(supervisor)supervisorId else previousSupervisor).apply()
   if(supervisor&&prefs.getBoolean("enabled",false))refreshToken(context)
   else {
    enqueue(context)
-   if(!supervisor&&configured(context))FirebaseMessaging.getInstance().deleteToken()
+   if(!supervisor){
+    context.getSystemService(NotificationManager::class.java).cancelAll()
+    if(configured(context))FirebaseMessaging.getInstance().deleteToken()
+   }
+  }
+ }
+ suspend fun endSession(context:Context){
+  val prefs=preferences(context)
+  val id=prefs.getString("installationId",null)
+  prefs.edit().putBoolean("supervisor",false).apply()
+  _session.value=false
+  WorkManager.getInstance(context).cancelUniqueWork("register-push-device")
+  try {
+   if(id!=null) kotlinx.coroutines.withTimeoutOrNull(5000) {
+    cl.duoc.tacticaltrack.data.remote.ApiFactory.devices.unregister(id)
+   }
+  }catch(error:kotlinx.coroutines.CancellationException){throw error}
+   catch(_:Exception){ /* Al volver a entrar se actualizará el registro del dispositivo. */ }
+  finally {
+   context.getSystemService(NotificationManager::class.java).cancelAll()
+   if(configured(context))FirebaseMessaging.getInstance().deleteToken()
   }
  }
  fun setEnabled(context:Context,enabled:Boolean){

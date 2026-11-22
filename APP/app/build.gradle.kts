@@ -32,8 +32,8 @@ android {
         minSdk = 26
         targetSdk = 35
         buildConfigField("String", "BACKEND_URL", "\"$backendUrl\"")
-        versionCode = 3
-        versionName = "1.2"
+        versionCode = 4
+        versionName = "1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -117,6 +117,7 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     testImplementation("junit:junit:4.13.2")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
     testImplementation("io.mockk:mockk:1.13.13")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
 
@@ -133,7 +134,7 @@ dependencies {
 jacoco { toolVersion = "0.8.12" }
 val logicClasses = fileTree(layout.buildDirectory.dir("tmp/kotlin-classes/debug")) {
     include("**/viewmodel/VisitViewModel*.class", "**/viewmodel/LoginViewModel*.class", "**/viewmodel/WeatherViewModel*.class")
-    include("**/data/repository/DemoAccountsRepository*.class", "**/data/repository/VisitRepository*.class", "**/data/repository/WeatherRepository*.class", "**/data/repository/CatalogRepository*.class", "**/data/repository/DeviceRegistrationRepository*.class", "**/domain/*.class")
+    include("**/data/repository/AuthRepository*.class", "**/data/repository/VisitRepository*.class", "**/data/repository/WeatherRepository*.class", "**/data/repository/CatalogRepository*.class", "**/data/repository/DeviceRegistrationRepository*.class", "**/domain/*.class")
     exclude("**/*Factory*.class")
 }
 val logicSources = files("src/main/java")

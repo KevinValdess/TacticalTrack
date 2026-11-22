@@ -10,6 +10,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -28,8 +30,7 @@ import cl.duoc.tacticaltrack.viewmodel.LoginViewModel
 
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel,
-    onLoginSuccess: (String, String) -> Unit
+    viewModel: LoginViewModel
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -55,6 +56,7 @@ fun LoginScreen(
                 label = { Text("Correo electrónico") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 singleLine = true,
+                enabled = !state.busy,
                 leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
                 isError = state.usernameError != null,
                 trailingIcon = {
@@ -72,6 +74,8 @@ fun LoginScreen(
                 value = state.password,
                 onValueChange = viewModel::onPasswordChange,
                 label = { Text("Contraseña") },
+                singleLine = true,
+                enabled = !state.busy,
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -90,21 +94,24 @@ fun LoginScreen(
             )
 
             Button(
-                onClick = {
-                    if (viewModel.validateAndRemember()) {
-                        val account = viewModel.uiState.value
-                        onLoginSuccess(account.displayName, account.role)
-                    }
-                },
+                onClick = viewModel::login,
+                enabled = !state.busy,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 24.dp)
             ) {
-                Text("Ingresar")
+                if (state.busy) CircularProgressIndicator() else Text("Ingresar")
+            }
+
+            state.error?.let { message ->
+                Text(message, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 12.dp))
+                TextButton(onClick = viewModel::restoreSession, enabled = !state.busy) {
+                    Text("Reintentar conexión")
+                }
             }
 
             Text(
-                "Ingresa con la cuenta de prueba asignada a tu equipo.",
+                "Ingresa con el correo registrado en TacticalTrack.",
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(top = 12.dp)
             )
